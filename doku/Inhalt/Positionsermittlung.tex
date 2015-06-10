@@ -1,0 +1,43 @@
+\section{Positionsermittlung}
+In diesem Kapitel wird beschrieben, wie die Position eines Anwenders
+auf der Karte bestimmt wird. Dazu werden die im Kapitel
+\nameref{cha:Recherche} beschriebenen Verfahren verwendet.
+
+\subsection{QR-Codes}
+\label{QR-Tags}
+An den Räumen werden QR-Codes angebracht, die eine Zuordnung 
+zu einem Knoten auf der Karte ermöglicht. Hier ist zu beachten,
+dass die Informationen in dem QR-Code auch von anderen Anwendungen
+interpretiert werden können. Deshalb kann hier nicht nur eine Knoten-ID
+hinterlegt werden.
+
+Wir haben uns für folgendes JSON-Format entschieden:
+\begin{lstlisting}
+{
+  "General": {
+    "Label": "A2.1.10",
+    "Name": "Aquarium"
+  },
+  "StudMap": {
+    "NodeId": "12",
+    "Url": "https://code.google.com/p/studmap/"
+  }
+}
+\end{lstlisting}
+
+\subsection{NFC-Tags}
+\label{NFC-Tags}
+Neben den QR-Codes werden auch NFC-Tags an den Räumen angebracht.
+Die Knoten werden über die NFC-ID des Chips zugeordnet.
+
+Um Benutzer, die den Navigations-Client nicht installiert haben, zu
+informieren wird eine URL auf den NFC-Tags gespeichert. Diese
+leitet auf eine Seite mit Informationen über den gescannten Raum
+und einen Link auf unsere Projektseite. In Zukunft kann hier auch
+ein Link auf den Google Play Store hinterlegt werden, um eine
+einfache Installation zu ermöglichen.
+
+Die URL sieht z.B. so aus (für das Aquarium):
+\begin{lstlisting}
+http://193.175.199.115/StudMapAdmin/Admin/NodeInfo?nodeId=847
+\end{lstlisting}

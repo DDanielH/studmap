@@ -1,0 +1,873 @@
+\section{Webservice}
+\label{cha:Webservice}
+Für den Zugriff auf die Daten stellen wir den Webservice \texttt{StudMap.Service} zur Verfügung.
+Der Webservice besteht dabei aus zwei Schnittstellen in Form von sogenannten Controller Klassen, die jeweils von der Klasse \texttt{ApiController} \footnote{siehe: \href{http://msdn.microsoft.com/en-us/library/system.web.http.apicontroller(v=vs.108).aspx}{MSDN Dokumentation}}  abgeleitet sind:
+\begin{itemize}
+\item \texttt{MapsController}: Verwaltung von Karten- und Routeninformationen
+\item \texttt{UsersController}: Verwaltung von Benutzerinformationen
+\end{itemize}
+
+Bevor nun die Funktionen der jeweiligen Controller Klasse erläutert werden, folgt eine Übersicht, über die verschiedenen Rückgabe Werte und ihre Bedeutung.
+
+\subsection{Allgemeine Objekte}
+Im folgenden werden die im Webservice verwendeten Objekte aufgeführt. Für jedes Objekt werden Eigenschaften und die Repräsentation der Daten im JSON-Format aufgelistet.
+
+\subsubsection{Edge}
+\label{object:Edge}
+Repräsentiert eine Kante in einem Graphen.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline StartNodeId & ID des Start-Knotens der Kante. \\ 
+\hline EndNodeId & ID des End-Knotens der Kante. \\ 
+\hline
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "StartNodeId": 12,
+  "EndNodeId": 6
+}
+\end{lstlisting}
+
+
+\subsubsection{Node}
+\label{object:Node}
+Repräsentiert einen Knoten in einem Graphen.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Id & ID des Knotens. \\ 
+\hline X & X-Koordinate auf dem Bild des Stockwerks. Wertebereich: 0.0 - 1.0. 0.0 bedeutet linker Bildrand. 1.0 bedeutet rechter Bildrand. \\ 
+\hline Y & Y-Koordinate auf dem Bild des Stockwerks. Wertebereich: 0.0 - 1.0. 0.0 bedeutet oberer Bildrand. 1.0 bedeutet unterer Bildrand. \\ 
+\hline FloorId & ID des Stockwerks auf dem sich der Knoten befindet. \\ 
+\hline HasInformation & true, wenn es Raum- oder PoI-Daten zu dem Knoten gibt. Ansonsten false. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Id": 12,
+  "X": 0.45,
+  "Y": 0.76,
+  "FloorId": 2,
+  "HasInformation": true
+}
+\end{lstlisting}
+
+
+\subsubsection{Graph}
+\label{object:Graph}
+Repräsentiert für ein Stockwerk den entsprechenden Teilgraphen.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline FloorId & ID des Stockwerks, das der entsprechende Graph repräsentiert. \\ 
+\hline Edges & Eine Liste von Kanten (s. \nameref{object:Edge}). \\ 
+\hline Nodes & Eine Liste von Knoten (s. \nameref{object:Node}). \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "FloorId": 12,
+  "Edges": { {...}, {...}, {...} },
+  "Nodes": { {...}, {...}, {...} }
+}
+\end{lstlisting}
+
+\subsubsection{Room}
+\label{object:Room}
+Repräsentiert Daten die für einen Raum relevant sind.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline NodeId & ID des Knotens an dem sich der Raum befindet. \\ 
+\hline DisplayName & Der Anzeigename für den Raum (z.B. Aquarium). \\ 
+\hline RoomName & Der eigentliche Raumname (z.B. A 2.0.11). \\ 
+\hline FloorId & Id des Floors, auf welchen sich der Room befindet. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "NodeId": 12,
+  "DisplayName": "Aquarium",
+  "RoomName": "A2.0.11",
+  "FloorId": 1
+}
+\end{lstlisting}
+
+
+\subsubsection{PoiType}
+\label{object:PoiType}
+Repräsentiert einen \nameref{object:PoI} Typen, wie beispielsweise Mensa oder Bibliothek.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Id & ID des PoI Typs. \\ 
+\hline Name & Der Name des PoI Typs (z.B. Mensa). \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Id": 12,
+  "Name": "Mensa"
+}
+\end{lstlisting}
+
+
+\subsubsection{PoI}
+\label{object:PoI}
+Repräsentiert einen Point Of Interest, wie beispielsweise eine Mensa oder eine Bibliothek.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Type & Typ des PoIs (s. \nameref{object:PoiType}). \\ 
+\hline Description & Beschreibung des PoIs. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Type": 1,
+  "Description": "In der Mensa kann man essen."
+}
+\end{lstlisting}
+
+\subsubsection{RoomAndPoI}
+\label{object:RoomAndPoI}
+Enthält Informationen zu einem Raum und dem zugeordneten PoI.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Room & Rauminformationen (s. \nameref{object:Room}). \\ 
+\hline PoI & PoI-Informationen (s. \nameref{object:PoI}). \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Room": {...},
+  "PoI": {...}
+}
+\end{lstlisting}
+
+
+\subsubsection{NodeInformation}
+\label{object:NodeInformation}
+Repräsentiert die für einen Knoten relevanten Daten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline DisplayName & Anzeigename für den Knoten (z.B. Dr. Schulten, Martin). \\ 
+\hline RoomName & Raumname für den Knoten (z.B. B2.0.03). \\ 
+\hline Node & NodeInformation repräsentiert diesen Knoten. \\ 
+\hline PoI & PoI Informationen zu diesem Knoten. \\  
+\hline QRCode & Dem Knoten zugeordnetem QR Code. \\ 
+\hline NFCTag & Dem Knoten zugeordnetem NFC Tag. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "DisplayName": "Dr. Schulten, Martin",
+  "RoomName": "B2.0.03",
+  "Node": {...},
+  "PoI": {...},
+  "QRCode": "...",
+  "NFCTag": "..."
+}
+\end{lstlisting}
+
+\subsubsection{QRCode}
+\label{object:QRCode}
+Repräsentiert die QRCode-Daten für den Knoten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline General & Grundsätzliche Informationen zu einem Raum. \\ 
+\hline StudMap & Allgemeine Informationen zum Projekt sind in StudMap hinterlegt. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "General": {...},
+  "StudMap": {...}
+}
+\end{lstlisting}
+
+\subsubsection{FullNodeInformation}
+\label{object:FullNodeInformation}
+Repräsentiert die für einen Knoten relevanten Daten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Map & Informationen zur gesamten Karte. \\ 
+\hline Floor & Repräsentiert die für dieses Stockwerk relevanten Daten. \\ 
+\hline Info & NodeInformation zum aktuellen Knoten. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Map": {...},
+  "Floor": {...},
+  "Info": {...}
+}
+\end{lstlisting}
+
+
+\subsubsection{Floor}
+\label{object:Floor}
+Repräsentiert die für ein Stockwerk relevanten Daten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Id & ID des Stockwerks. \\ 
+\hline MapId & ID der Karte zu dem das Stockwerk gehört. \\ 
+\hline Name & Name des Stockwerks. \\ 
+\hline ImageUrl & Der Dateipfad auf dem Server zum Bild des Stockwerks. \\  
+\hline CreationTime & Zeitstempel, an dem das Stockwerk erstellt wurde. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Id": 1011,
+  "MapId": 3,
+  "Name": "Ebene 0",
+  "ImageUrl": "Images/Floors/RN_Ebene_0.png",
+  "CreationTime": "2013-11-18 14:36:24.607"
+}
+\end{lstlisting}
+
+
+\subsubsection{Map}
+\label{object:Map}
+Repräsentiert die für eine Karte relevanten Daten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Id & ID der Karte. \\ 
+\hline Name & Name der Karte. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Id": 3,
+  "Name": "Westfälische Hochschule",
+}
+\end{lstlisting}
+
+
+\subsubsection{User}
+\label{object:User}
+Repräsentiert die für einen Benutzer relevanten Daten.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline Name & Name des Benutzers. \\ 
+\hline 
+\end{tabularx} 
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Name": "Daniel",
+}
+\end{lstlisting}
+
+
+\subsubsection{SaveGraphRequest}
+\label{object:SaveGraphRequest}
+Repräsentiert die Änderungen an dem Teilgraph für ein Stockwerk.
+
+Eigenschaften:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline FloorId & ID des Stockwerks. \\ 
+\hline NewGraph & Der hinzugefügte Teilgraph (s. \nameref{object:Graph}). \\ 
+\hline DeletedGraph & Der gelöschte Teilgraph (s. \nameref{object:Graph}). \\ 
+\hline
+\end{tabularx}
+
+Beispiel: 
+\begin{lstlisting}
+{
+  "FloorId": 2,
+  "NewGraph": {...},
+  "DeletedGraph": {...}
+}
+\end{lstlisting}
+
+\subsection{Rückgabe Objekte}
+
+\subsubsection{BaseResponse}
+\label{BaseResponse}
+Allgemeine Rückgabe vom Service, die einen Status und ggf. einen Fehler enthält. Die Daten werden im JSON Format zurück gegeben.
+
+\textbf{Beispiel:}
+\begin{lstlisting}
+{
+  "Status":1, 
+  "ErrorCode":0
+}
+\end{lstlisting}
+
+\paragraph{ResponseStatus}
+Wir unterscheiden zwischen:
+\begin{itemize}
+\item \texttt{None = 0}: Defaultwert
+\item \texttt{Ok = 1}: Funktion erfolgreich ausgeführt
+\item \texttt{Error = 2}: Fehler bei Funktionsausführung
+\end{itemize}
+
+\paragraph{ResponseError}
+Ist beim \texttt{ResponseStatus Error} gesetzt. Es werden folgende Fehlerszenarien unterschieden:
+
+\textbf{Allgemein:}
+\begin{itemize}
+\item \texttt{001 - DatabaseError}:\\
+Fehler bei der Ausführung einer Datenbankabfrage.
+\item \texttt{002 - Unknown}:\\
+Unbekannter Fehler.
+\end{itemize}
+
+\textbf{Registrierung:}
+\begin{itemize}
+\item \texttt{101 - UserNameDuplicate}:\\
+Der Benutzername ist bereits vergeben.
+\item \texttt{102 - UserNameInvalid}:\\
+Der Benutzername ist ungültig.
+\item \texttt{103 - PasswordInvalid}:\\
+Das Passwort ist ungültig.
+\end{itemize}
+
+\textbf{Anmeldung:}
+\begin{itemize}
+\item \texttt{110 - LoginInvalid}:\\
+Die Logindaten (Name oder Passwort) sind ungültig.
+\end{itemize}
+
+\textbf{Maps:}
+\begin{itemize}
+\item \texttt{201 - MapIdDoesNotExist}:\\
+Zur angeforderten MapId existiert keine Map.
+\item \texttt{202 - FloorIdDoesNotExist}:\\
+Zur angeforderten FloorId existiert kein Floor.
+\item \texttt{203 - NodeIdDoesNotExist}:\\
+Zur angeforderten NodeId existiert kein Node.
+\end{itemize}
+
+\textbf{Navigation:}
+\begin{itemize}
+\item \texttt{301 - NoRouteFound}:\\
+Es konnte keine Route gefunden werden.
+\item \texttt{302 - StartNodeNotFound}:\\
+Der angegebene Startknoten existiert nicht.
+\item \texttt{303 - EndNodeNotFound}:\\
+Der angegebene Endknoten existiert nicht.
+\end{itemize}
+
+\textbf{Information:}
+\begin{itemize}
+\item \texttt{401 - PoiTypeIdDoesNotExist}:\\
+Zur angegebenen PoiTypeId existiert kein PoiType.
+\item \texttt{402 - NFCTagDoesNotExist}:\\
+Das angegebene NFC-Tag wurde nicht gefunden.
+\item \texttt{403 - QRCodeDosNotExist}:\\
+Der angegebene QR-Code wurde nicht gefunden.
+\item \texttt{404 - PoiDoesNotExist}:\\
+Zur angegebenen PoiId existiert kein PoI.
+\item \texttt{405 - QRCodeIsNullOrEmpty}:\\
+Es wurde kein QR-Code angegeben.
+\item \texttt{406 - NFCTagIsNullOrEmpty}:\\
+Es wurde kein NFC-Tag angegeben.
+\item \texttt{407 - NFCTagAllreadyAssigned}:\\
+Das NFC-Tag ist bereits einem anderen Knoten zugeordnet.
+\end{itemize}
+
+\subsection{ObjectResponse}
+\label{ObjectResponse}
+Eine generische Klasse die \nameref{BaseResponse} um ein Feld \texttt{Object} erweitert, indem die Nutzdaten gespeichert werden.
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Status": 1, 
+  "ErrorCode": 0,
+  "Object": {...}
+}
+\end{lstlisting}
+
+\subsection{ListResponse}
+\label{ListResponse}
+Eine generische Klasse die \nameref{BaseResponse} um eine Liste \texttt{List} erweitert, indem Nutzdaten in Form einer Collection gespeichert werden.
+
+Beispiel:
+\begin{lstlisting}
+{
+  "Status": 1, 
+  "ErrorCode": 0,
+  "List": [...]
+}
+\end{lstlisting}
+
+\subsection{MapsController}
+
+\subsubsection{CreateMap}
+\label{service:CreateMap}
+Erstellt eine neue Karte mit dem vorgegebenen Namen.
+
+POST
+\url{/api/Maps/CreateMap?mapName=WHS}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapName & Sprechender Name der Karte. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Map}
+
+\subsubsection{DeleteMap}
+\label{service:DeleteMap}
+Löscht eine Karte mit der angegebenen ID.
+
+POST
+\url{/api/Maps/DeleteMap?mapId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Map, die gelöscht werden soll. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{GetMaps}
+\label{service:GetMaps}
+Liefert eine Liste aller Karten zurück.
+
+GET
+\url{/api/Maps/GetMaps}
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:Map}
+
+
+\subsubsection{CreateFloor}
+\label{service:CreateFloor}
+Erstellt einen Floor zu einer Map mit einem sprechenden Namen.
+
+POST
+\url{/api/Maps/CreateFloor?mapId=2&name=Erdgeschoss}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Map, zu der ein Floor angelegt wird. \\ 
+\hline name & Sprechender Name des Floors. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Floor}
+
+
+\subsubsection{DeleteFloor}
+\label{service:DeleteFloor}
+Löscht einen Floor mit der angegebenen ID.
+
+POST
+\url{/api/Maps/DeleteFloor?floorId=3}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline floorId & ID des Floors, der gelöscht werden soll. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{GetFloorsForMap}
+\label{service:GetFloorsForMap}
+Liefert alle Stockwerke einer Karte.
+
+GET
+\url{/api/Maps/GetFloorsForMap?mapId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte, von der die Stockwerke abgefragt werden sollen. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:Floor}
+
+\subsubsection{GetFloor}
+\label{service:GetFloor}
+Liefert Informationen zu einem Stockwerk.
+
+GET
+\url{/api/Maps/GetFloor?floorId=3}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline floorId & ID des Stockwerks. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Floor}
+
+\subsubsection{GetFloorplanImage}
+\label{service:GetFloorplanImage}
+Liefert die URL des Bilds zu einem Stockwerk.
+
+GET
+\url{/api/Maps/GetFloorplanImage?floorId=3}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline floorId & ID des Stockwerks. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: String
+
+\subsubsection{SaveGraphForFloor}
+\label{service:SaveGraphForFloor}
+Speichert den Graphen zu einem Stockwerk ab.
+
+POST
+\url{/api/Maps/SaveGraphForFloor}
+
+POST Body: \nameref{object:SaveGraphRequest}
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Graph}
+
+\subsubsection{DeleteGraphForFloor}
+\label{service:DeleteGraphForFloor}
+Löscht den Teilgraphen auf einem Stockwerk.
+Die Teilgraphen auf anderen Stockwerken werden nicht verändert.
+Kanten die Stockwerke mit diesem Stockwerk verbinden, werden
+ebenfalls entfernt.
+
+POST
+\url{/api/Maps/DeleteGraphForFloor?floorId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline floorId & ID des Stockwerks, dessen Teilgraph gelöscht werden soll. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{GetGraphForFloor}
+\label{service:GetGraphForFloor}
+Liefert den Teilgraphen für ein Stockwerk.
+
+GET
+\url{/api/Maps/GetGraphForFloor?floorId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline floorId & ID des Stockwerks. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Graph}
+
+
+\subsubsection{GetConnectedNodes}
+\label{service:GetConnectedNodes}
+Liefert die Knoten zurück, die mit dem übergebenen Knoten verbunden sind.
+
+GET
+\url{/api/Maps/GetConnectedNodes?nodeId=1011}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline nodeId & ID des Knotens. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:Node}
+
+
+\subsubsection{GetRouteBetween}
+\label{service:GetRouteBetween}
+Liefert die Route zwischen zwei Knoten, wenn diese existiert.
+
+GET
+\url{/api/Maps/GetRouteBetween?mapId=2&startNodeId=12&endNodeId=46}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte, auf der die Route bestimmt werden soll. \\ 
+\hline startNodeId & ID des Startknotens. \\ 
+\hline endNodeId & ID des Zielknotens. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:Node}
+
+
+\subsubsection{GetNodeInformationForNode}
+\label{service:GetNodeInformationForNode}
+Liefert weitere Informationen zu einem Knoten.
+Diese umfassen Raumnummern, zugeordnete NFC- und QR-Tags, usw.
+
+GET
+\url{/api/Maps/GetNodeInformationForNode?nodeId=12}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline nodeId & ID des Knotens. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Graph}
+
+
+\subsubsection{GetFullNodeInformationForNode}
+\label{service:GetFullNodeInformationForNode}
+Liefert alle Informationen zu einem Knoten.
+Diese umfassen die Objekte \nameref{object:Map}, \nameref{object:Floor} und \nameref{object:NodeInformation}.
+
+GET
+\url{/api/Maps/GetFullNodeInformationForNode?nodeId=1011}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline nodeId & ID des Knotens. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:FullNodeInformation}
+
+
+\subsubsection{GetNodeInformaion}
+\label{service:GetNodeInformaion}
+Liefert Informationen zu allen Knoten auf einem Stockwerk.
+
+GET
+\url{/api/Maps/GetNodeInformaion?mapId=2&floorId=12}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte. \\ 
+\hline floorId & ID des Stockwerks. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:NodeInformation}
+
+
+\subsubsection{SaveNodeInformation}
+\label{service:SaveNodeInformation}
+Speichert zusätzliche Informationen zu einem Knoten ab.
+
+POST
+\url{/api/Maps/SaveNodeInformation}
+
+POST Body: \nameref{object:NodeInformation}
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:NodeInformation}
+
+
+\subsubsection{GetPoiTypes}
+\label{service:GetPoiTypes}
+Liefert eine Liste aller Typen von PoIs zurück.
+
+GET
+\url{/api/Maps/GetPoiTypes}
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:PoiType}
+
+\subsubsection{GetPoIsForMap}
+\label{service:GetPoIsForMap}
+Liefert eine Liste aller PoIs auf einer Karte zurück.
+
+GET
+\url{/api/Maps/GetPoIsForMap?mapId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:RoomAndPoI}
+
+\subsubsection{GetRoomsForMap}
+\label{service:GetRoomsForMap}
+Liefert eine Liste aller Räume auf einer Karte zurück.
+
+GET
+\url{/api/Maps/GetRoomsForMap?mapId=2}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:Room}
+
+\subsubsection{GetNodeForNFC}
+\label{service:GetNodeForNFC}
+Sucht auf einer Karte nach einem Knoten mit einem bestimmten NFC-Tag.
+
+GET
+\url{/api/Maps/GetNodeForNFC?mapId=2&nfcTag=46A6CG739ED9}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte. \\ 
+\hline nfcTag & NFC-Tag, nach dem gesucht werden soll. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Node}
+
+
+\subsubsection{GetNodeForQRCode}
+\label{service:GetNodeForQRCode}
+Sucht auf einer Karte nach einem Knoten mit einem bestimmten QR-Code.
+
+GET
+\url{/api/Maps/GetNodeForQRCode?mapId=2&qrCode=46A6CG739ED9}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline mapId & ID der Karte. \\ 
+\hline qrCode & QR-Code, nach dem gesucht werden soll. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{ObjectResponse}, \nameref{object:Node}
+
+
+\subsubsection{SaveNFCForNode}
+\label{service:SaveNFCForNode}
+Speichert ein NFC-Tag zu einem bestimmten Knoten.
+
+GET
+\url{/api/Maps/SaveNFCForNode?nodeId=1011&nfcTag=46A6CG739ED9}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline nodeId & ID des Knotens. \\ 
+\hline nfcTag & NFC-Tag, der abgespeichert werden soll. \\ 
+\hline 
+\end{tabularx}
+
+Rückgabewert: \nameref{BaseResponse}
+
+
+\subsubsection{SaveQRCodeForNode}
+\label{service:SaveQRCodeForNode}
+Speichert einen QR-Code zu einem bestimmten Knoten.
+
+GET
+\url{/api/Maps/SaveQRCodeForNode?nodeId=1011&qrCode=46A6CG739ED9}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline nodeId & ID des Knotens. \\ 
+\hline qrCode & QR-Code, der abgespeichert werden soll. \\ 
+\hline 
+\end{tabularx}
+
+Rückgabewert: \nameref{BaseResponse}
+
+
+\subsection{UsersController}
+\label{Webservice_UsersController}
+Der \texttt{UsersController} stellt klassische Funktionen zur Benutzerverwaltung zur Verfügung.
+
+\subsubsection{Register}
+\label{service:Register}
+Registriert einen neuen Anwender in der Benutzerrolle Benutzer.
+
+POST
+\url{/api/Users/Register?userName=test&password=geheim}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline userName & Der Benutzername. \\ 
+\hline password & Passwort im Klartext. \\ 
+\hline 
+\end{tabularx} 
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{Login}
+\label{service:Login}
+Meldet einen bereits registrierten Anwender am System an.
+
+POST
+\url{/api/Users/Login?userName=test&password=geheim}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline userName & Der Benutzername. \\ 
+\hline password & Passwort im Klartext. \\ 
+\hline 
+\end{tabularx}
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{Logout}
+\label{service:Logout}
+Meldet einen angemeldeten Anwender vom System ab.
+
+GET
+\url{/api/Users/Logout?userName=test}
+
+Parameter:\\
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline userName & Der Benutzername. \\ 
+\hline 
+\end{tabularx}
+
+Rückgabewert: \nameref{BaseResponse}
+
+\subsubsection{GetActiveUsers}
+\label{service:GetActiveUsers}
+Ermittelt eine Liste der aktuell am System angemeldeten Anwender.
+
+GET
+\url{/api/Users/GetActiveUsers}
+
+Rückgabewert: \nameref{ListResponse}, \nameref{object:User}
+
+
+\subsection{Verwendung der Benutzerschnittstelle}
+\label{Verwendung_Benutzerschnittstelle}
+\subsubsection{Registrierung}
+Bevor sich ein Benutzer am StudMap System anmelden kann, muss er sich zunächst über die Funktion \nameref{service:Register} registrieren.
+
+\subsubsection{Aktive und inaktive Benutzer}
+Im StudMap System wird zwischen aktiven und inaktiven Benutzern unterschieden. Nachdem sich ein Benutzer am System registriert hat gilt dieser als inaktiv. Über die Funktion \nameref{service:Login} kann er sich am System anmelden und gilt somit als aktiv.
+
+Damit der angemeldete Benutzer auch aktiv bleibt, sollte sich dieser in einem Zeitintervall von fünf Minuten über die Methode \nameref{service:Login} am System aktiv melden. Nach einer Inaktivität von 15 Minuten wird der Benutzer automatisch inaktiv.
+
+Über die Funktion \nameref{service:Logout} kann sich ein Benutzer wieder vom System abmelden und wird somit inaktiv.
+
+\subsubsection{Aktive Benutzer abfragen}
+Die aktiven Benutzer können über die Funktion \nameref{service:GetActiveUsers} abgefragt werden. Damit die Anzeige der aktiven Benutzer im Client möglichst aktuell ist, sollte diese Abfrage ebenfalls in regelmäßigen Zeitabständen erfolgen.

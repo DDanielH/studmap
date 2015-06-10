@@ -1,0 +1,131 @@
+\chapter{Admin}
+Wesentlicher Bestandteil unseres Projektes war die Administrationsumgebung. Genauer musste eine Anwendung geschaffen werden, in der Navigationsdaten hinterlegt werden können. Des Weiteren muss die Administrationsanwendung Features besitzen um Routen zu definieren und Meta-Informationen zu besonderen Örtlichkeiten festhalten zu können. Die Meta-Informationen können durch Points of Interest (PoI) Daten erweitert werden.\\
+Im folgenden Abschnitt wird zunächst die allgemeine Struktur erläutert und anschließend liegt das Hauptaugenmerk auf der Benutzeroberfläche. Eine ausführliche Bedienungsanleitung der Administrationsumgebung ist im Anhang unter \nameref{Admin-Doku} beigefügt.
+
+\section{Allgemeine Struktur}
+\subsection*{ASP.NET MVC 5}
+Basis unserer Projektstruktur war das 
+\textit{ASP.NET MVC Framework}\footnote{\href{http://www.asp.net/mvc}{http://www.asp.net/mvc}},
+welches ein Web Application Framework ist und ein Model-View-Controller-Pattern implementiert.\\
+Dies ermöglichte uns, eine Webanwendung zu entwickeln, bei der die Daten (\textit{Model}) gekapselt von der Ausgabe (\textit{View}) und dem \textit{Controller} vorliegen. Die \textit{View} präsentiert unsere Daten und der \textit{Controller} reagiert auf Benutzereingaben und ist sozusagen das Bindeglied oder die Schnittstelle zwischen \textit{View} und \textit{Model}.
+
+\subsection{Model}
+\subsubsection*{Account}
+Diese Models wurden von MVC automatisch generiert und werden bei
+der Registrierung und der An- und Abmeldung von Benutzern verwendet.
+
+\subsubsection*{Admin}
+Anwendungsspezifische Daten wie Karten, Stockwerke, Knoten, usw. werden
+in selbst definierten Models gekapselt.
+
+\subsection{View}
+Die Views in unserem Projekt wurden die Bereiche Account, Admin und Home unterteilt.
+\subsubsection*{Account}
+Enthält HTML-Seiten zum Registrieren, Anmelden und Verwalten des eigenen Benutzerprofils.
+\subsubsection*{Admin}
+Unter diese Rubrik fallen die Webseiten, mit denen der Administrator  Stockwerke und Knoteninformationen zu einer Karte hinzufügen kann. Dies ist die Arbeitsoberfläche des Administrators.
+\subsubsection*{Home}
+Einstiegspunkt bzw. Index unserer Webseite.
+
+\subsection{Controller}
+In unserem Projekt gibt es drei Controller.
+
+\subsubsection*{HomeController}
+Der Einstiegspunkt unserer Web-Anwendung ist der sogenannte \textit{HomeController}. Dies ist der Controller, der zum Zuge kommt, sofern die anderen beiden Controller eine Interaktion oder Controller-Aufrufe mit gewissen Parametern nicht unterstützen.
+
+\subsubsection*{AccountController}
+Der \textit{AccountController} verarbeitet die Ereignisse, die vom Registrierungs-, LogIn- und LogOut-Verhalten eines Benutzers ausgelöst werden. Im Fokus stehen hierbei die \textbf{HTTP GET-} und \textbf{HTTP POST-Methoden}, die von der Klasse \textit{AccountController} implementiert werden.
+
+\subsubsection*{AdminController}
+Der \textit{AdminController} reagiert auf Zustandsänderungen, die beim Anlegen, Bearbeiten und Löschen von Datenmaterial in Form von Karten oder Informationen (Meta-Informationen) ausgelöst werden.\\
+Relevante Funktionen sind die Methoden zum Erstellen und Löschen von Karten und Stockwerken.
+Des Weiteren werden über diesen Controller die Routeninformationen als Graph verarbeitet und in einer Datenbank gespeichert. Detailinformationen zu einem Knoten aus einem Graphen verarbeitet dieser Controller und speichert sie ab. Diese Detailinformationen ermöglichen besondere Orte als \textit{Points of Interest} zu kennzeichnen.
+
+\section{Benutzeroberfläche}
+Die Admin-Oberfläche ist über folgenden Link erreichbar:\\
+\href{http://193.175.199.115/StudMapAdmin/}{http://193.175.199.115/StudMapAdmin/}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminHome}
+\caption[AdminHome]{Admin-Oberfläche}
+\label{fig:AdminHome}
+\end{figure}
+\newpage
+Der Anwender hat die Möglichkeit sich anzumelden oder zu registrieren.
+\subsubsection*{Registrieren}
+\href{http://193.175.199.115/StudMapAdmin/Account/Register}{http://193.175.199.115/StudMapAdmin/Account/Register}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminRegistrierung}
+\caption[AdminRegistrierung]{Registrierung eines Anwenders}
+\label{fig:AdminRegistrierung}
+\end{figure}
+
+\subsubsection*{Anmelden}
+\href{http://193.175.199.115/StudMapAdmin/Account/Login}{http://193.175.199.115/StudMapAdmin/Account/Login}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminAnmelden}
+\caption[AdminRegistrierung]{Anmeldung eines Anwenders}
+\label{fig:AdminAnmelden}
+\end{figure}
+
+\subsubsection*{Admin}
+Der Einstiegspunkt zum Verwalten von Karten befindet sich unter folgendem Link: \\
+\href{http://193.175.199.115/StudMapAdmin/Admin}{http://193.175.199.115/StudMapAdmin/Admin}\\
+Dieser enthält eine Auflistung aktuell vorhandener Karten. Es  können neue Karten erstellt bzw. vorhandene entfernt werden.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminMaps}
+\caption[AdminMaps]{Kartenübersicht}
+\label{fig:AdminMaps}
+\end{figure}
+
+Die Verwaltung der einzelnen Stockwerke zu einer Karte werden in der nachfolgenden Grafik gezeigt. Durch einen Klick auf \textit{Anlegen} kann eine neues Stockwerk mit der zugehörigen Kartengrundlage hinzugefügt werden.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminFloors}
+\caption[AdminFloors]{Stockwerkübersicht}
+\label{fig:AdminFloors}
+\end{figure}
+
+Unter Layer wird die Karte und ein gegebenenfalls erstellter Graph zu genau einem Stockwerk angezeigt.
+Der Administrator kann hier einen Graphen erstellen und Knoteninformationen hinterlegen. Des Weiteren besteht die Möglichkeit Knoten stockwerkübergreifend zu verknüpfen. Basis für eine ergonomische Navigation der Karte ist die JavaScript-Bibliothek \textit{D3}.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminLayer}
+\caption[AdminLayer]{Kartenwerk mit Graph}
+\label{fig:AdminLayer}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../Bilder/Admin/AdminNodeInfo}
+\caption[AdminNodeInfo]{Knoteninformationen zu einem Knoten}
+\label{fig:AdminNodeInfo}
+\end{figure}
+Über den Schaltfläche \textit{Abmelden} gelangt man zur Hauptseite zurück.
+
+\section{Admin Spezifisches}
+\subsection{Neuen Benutzer mit Administrator Rechten versehen}
+\label{Administrator Rechte versehen}
+Nachdem ein neuer Benutzer die Registrierung erfolgreich abgeschlossen hat, ist dieser im Benutzerprofil noch nicht als Administrator gekennzeichnet. Derzeit ist es so, dass ein Datenbankadministrator in der Tabelle \textit{webpages\_UsersInRoles} den Eintrag von "`1"' für Users auf "`2"' für Admins abändern muss. Nur Administratoren haben die Rechte Maps und Floors zu erstellen, sowie das Kartenmateral mit Meta-Informationen zu bereichern.
+
+\subsection{ELMAH}
+Als Logging Werkzeug haben wir das auf der .NET Plattform sehr verbreitete und OpenSource Tool \textit{ELMAH}\footnote{\href{https://code.google.com/p/elmah/}{https://code.google.com/p/elmah/}} eingesetzt. \textit{ELMAH} loggt auftretende Fehler und Exceptions.
+
+\subsection{Maintenance Tool}
+Während der Entwicklung des StudMap-Projektes ist uns aufgefallen, dass 
+zur Wartung und Ausführung bestimmter Aufgaben ein einfaches Tool hilfreich wäre. Daher haben wir eine WPF-Anwendung entwickelt, die bisher allerdings nur QR-Codes generieren kann.
+
+\subsubsection{QR-Codes generieren}
+Eine Möglichkeit der Positionsermittlung innerhalb des StudMap-Projektes ist das 
+Einlesen von QR-Codes. In diesen QR-Codes stehen die im Kapitel 
+\nameref{QR-Tags} beschriebenen Daten.
+
+In der Anwendung werden alle \nameref{object:NodeInformation} ausgelesen und 
+in einer Tabelle angezeigt. Anschließend kann in dieser Tabelle nach 
+einem \nameref{object:Floor} oder dem Namen des Raums gefiltert werden.
+
+Abschließend kann für alle ausgewählten Knoten ein QR-Code als PNG generiert 
+werden. Zur Generierung der QR-Codes nutzen wir die Bibliothek 
+\href{http://qrcodenet.codeplex.com/}{QrCode.Net}.

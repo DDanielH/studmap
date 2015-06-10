@@ -1,0 +1,153 @@
+\newpage
+\section{Client}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{./Bilder/ClientGuide/ErsterStart.png}
+\label{fig:ErsterStart}
+\vspace{-10pt}
+\end{figure}
+Startet ein Benutzer die App erstmalig auf seinem Smartphone, so wird er von einem Willkommen-Dialog begrüßt. In diesem Dialog kann er die Karte auswählen, welche er nutzen möchte. Diese Auswahl kann später unter Einstellungen (siehe \ref{Einstellungen}) geändert werden. Zur Zeit steht für StudMap lediglich die Karte für die Westfälische Hochschule am Standort Bocholt zur Verfügung.
+
+Nachdem die Auswahl erfolgt ist, wird die Karte geladen und die Applikation startet mit der Anzeige der untersten Ebene (hier Ebene 0).
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/Start.png}
+\caption{App nach erfolgreichem Start}
+\label{fig:Startansicht}
+\end{figure}
+
+
+
+\subsection{Karte}
+Die Karte wird über verschiedene Touch-Funktionen bedient. So kann mit der bekannten "`Pinch-to-Zoom"'-Geste in die Karte hinein bzw. hinaus gezoomt werden.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/ZoomEbene1.png}
+\caption{Vergrößerte Ansicht von Ebene 1}
+\label{fig:ZoomEbene1}
+\end{figure}
+
+\subsubsection{Start-/Zielpunkt wählen}
+\label{ssec:StartZielpunkt}
+
+Um einen Punkt als Start- oder Zielpunkt zu markieren, öffnet sich nach der Anwahl eines Punktes ein Dialog mit entsprechenden Auswahlmöglichkeiten.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{./Bilder/ClientGuide/StartZiel.png}
+\caption{Dialog zur Start-, Zielpunktwahl}
+\label{fig:StartZielWahl}
+\end{figure}
+
+Markierte Punkte werden zunächst vergrößert und rot dargestellt.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{./Bilder/ClientGuide/EinblendungStartpunkt.png}
+\caption{Vergrößerte Ansicht des Dialogs für einen Startpunkt}
+\label{fig:Startpunkt}
+\end{figure}
+
+\subsubsection{Navigation}
+Wurde ein Start- und ein Zielpunkt gewählt (siehe \nameref{ssec:StartZielpunkt}), wird eine Route automatisch berechnet und eingezeichnet. Start und Ziel bekommen jeweils ein ansprechendes Symbol und unten im Bild ist eine Einblendung über Start und Ziel.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/Navigation.png}
+\caption{Ansicht der Karte mit eingeblendeter Route}
+\label{fig:Navigation}
+\end{figure}
+
+\subsection{ActionBar}
+\begin{wrapfigure}{r}{0.4\textwidth}
+\vspace{-20pt}
+ \begin{center}
+   \includegraphics[scale=0.5]{./Bilder/ClientGuide/ActionBar.png}
+ \end{center}
+ \vspace{-30pt}
+\end{wrapfigure}
+Die Icons in der ActionBar erlauben den Zugriff auf die Suche, die Positionierung und das Neuladen der Karte.
+
+\subsubsection{Suche}
+Bei der Suchfunktion kann über ein Suchfeld, welches sich selbst vervollständigt (\ref{fig:Suchen}, rechtes Bild), ein gesuchter Raum gefunden werden.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/RaumSuchen.png}
+\hspace{15mm}
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/RaumSuchenAutoComplete.png}
+\caption{Ansicht der Suche und der AutoComplete-Funktion}
+\label{fig:Suchen}
+\end{figure}
+
+Wird ein Punkt durch die Suche oder den PoI-Dialog (siehe \nameref{PoIDialog}) markiert, so wird dieser leicht vergrößert und rot dargestellt. Im unteren Bildschirm wird zusätzlich ein Dialog mit den Knoteninformationen eingeblendet.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/RaumMarkiert.png}
+\caption{Ansicht der Karte mit einem Markierten Raum}
+\label{fig:RaumMarkierung}
+\end{figure}
+
+\subsubsection{Positionierung}
+Die Positionierung kann auf zwei Arten erfolgen. Zum einen kann ein NFC-Tag eingescannt werden, dies erfolgt im Hintergrund und es ist keine Benutzeraktion notwendig. Zum anderen kann ein QR-Code eingescannt werden, wozu zunächst über das entsprechende Icon der Scanner gestartet werden muss.
+
+\subsubsection{Neuladen}
+Sollte die Karte einmal nicht erreichbar sein oder nur fehlerhaft geladen werden, so kann hier das Laden der Karte manuell angestoßen werden.
+
+\subsection{Menü}
+Über einen Wisch vom linken Rand nach rechts lässt sich das Menü aufrufen.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/Swipe.png}
+\hspace{15mm}
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/LeftDrawer.png}
+\caption{Ansicht des Menüs}
+\label{fig:Menue}
+\end{figure}
+
+\subsubsection{Ebene auswählen}
+\begin{wrapfigure}{l}{0.4\textwidth}
+ \vspace{-30pt}
+ \begin{center}
+   \includegraphics[scale=0.5]{./Bilder/ClientGuide/EbenenAnsicht.png}
+ \end{center}
+ \vspace{-20pt}
+\end{wrapfigure}
+Hier lässt sich die anzuzeigende Ebene auswählen. Die momentan aktive Ebene wird hellgrün markiert.\\
+\\
+\\
+\subsubsection{Anmelden}
+In diesem Dialog kann sich der User anmelden oder erstmalig registrieren.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/AnmeldeDialog.png}
+\caption{Dialog für die Anmeldung}
+\label{fig:AnmeldeDialog}
+\end{figure}
+
+\subsubsection{Points of Interest}
+\label{PoIDialog}
+Der Dialog gibt einen Überblick über interessante Punkte. Über ein Suchfeld lässt sich die Auswahl beschränken.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/PoIDialog.png}
+\hspace{15mm}
+\includegraphics[scale=0.3]{./Bilder/ClientGuide/PoIAutoComplete.png}
+\caption{Points of Interest Dialog}
+\label{fig:PoIDialog}
+\end{figure}
+
+\subsubsection{Einstellungen}
+\label{Einstellungen}
+\begin{wrapfigure}{r}{0.4\textwidth}
+ \vspace{-30pt}
+ \begin{center}
+   \includegraphics[scale=0.3]{./Bilder/ClientGuide/Settings.png}
+ \end{center}
+ \vspace{-20pt}
+\end{wrapfigure}
+In den Einstellungen können die anzuzeigende Karte und die IP-Adresse des Host eingestellt bzw. geändert werden.
+\\\\
+\subsubsection{About}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{./Bilder/ClientGuide/About.png}
+\caption{About Dialog}
+\label{fig:About}
+\end{figure}
